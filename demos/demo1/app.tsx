@@ -20,6 +20,7 @@ const sampleAnimation: Animation<string, string | number> = {
     },
     {
       ref: "size",
+      interpolation: "linear",
       keyframes: {
         0: 1,
         5: 1.1,
@@ -28,6 +29,7 @@ const sampleAnimation: Animation<string, string | number> = {
         35: 1.4,
         45: 1.5,
         55: 1.25,
+        60: 1,
       },
     },
   ],
@@ -48,14 +50,15 @@ const App = () => {
   });
   const updateFn: UpdateFn<string, string | number> = React.useCallback(
     (ref, value) => {
-      console.log("UPDATE FN CALLED");
       dispatch([ref, value]);
     },
     []
   );
-  const [player] = React.useState(() =>
-    createPlayer(updateFn, sampleAnimation)
-  );
+  const [player] = React.useState(() => {
+    const p = createPlayer(updateFn, sampleAnimation);
+    p.play();
+    return p;
+  });
   return (
     <div>
       <h1>Demo 1</h1>
