@@ -1,0 +1,20 @@
+{
+  "name": "@keyframesdemos/demo1",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Thiago Hirata",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "start": "esbuild app.tsx --bundle --servedir=dist --outdir=dist --serve --watch"
+  },
+  "dependencies": {
+    "keyframes-core": "workspace:packages/keyframes-core",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.61",
+    "esbuild": "^0.20.1"
+  }
+}
