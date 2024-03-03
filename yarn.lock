@@ -897,6 +897,19 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@keyframesdemos/demo2@workspace:demos/demo2":
+  version: 0.0.0-use.local
+  resolution: "@keyframesdemos/demo2@workspace:demos/demo2"
+  dependencies:
+    "@types/react": "npm:^18.2.61"
+    esbuild: "npm:^0.20.1"
+    keyframes-core: "workspace:packages/keyframes-core"
+    lodash: "npm:^4.17.21"
+    react: "npm:^18.2.0"
+    react-dom: "npm:^18.2.0"
+  languageName: unknown
+  linkType: soft
+
 "@mole-inc/bin-wrapper@npm:^8.0.1":
   version: 8.0.1
   resolution: "@mole-inc/bin-wrapper@npm:8.0.1"

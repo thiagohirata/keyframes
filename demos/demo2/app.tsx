@@ -4,37 +4,66 @@ import type { Animation, UpdateFn } from "keyframes-core/src";
 import { createPlayer } from "keyframes-core/src/simplePlayer";
 import _times from "lodash/times";
 
-const sampleAnimation: Animation<string, string | number> = {
-  loopCount: -1,
-  frameCount: 60,
-  layers: [
-    {
-      ref: "color",
-      keyframes: {
-        0: "rgb(255,0,0)",
-        10: "rgb(205,0,0)",
-        20: "rgb(155,0,0)",
-        30: "rgb(105,0,0)",
-        40: "rgb(55,0,0)",
-        50: "rgb(180,0,0)",
+const sampleAnimationStack: Animation<string, string | number>[] = [
+  /* played 3 times */
+  {
+    loopCount: 3,
+    frameCount: 30,
+    layers: [
+      {
+        ref: "color",
+        keyframes: {
+          0: "rgb(255,0,0)",
+          10: "rgb(205,0,0)",
+          20: "rgb(155,0,0)",
+          30: "rgb(105,0,0)",
+        },
       },
-    },
-    {
-      ref: "size",
-      interpolation: "linear",
-      keyframes: {
-        0: 1,
-        5: 1.1,
-        15: 1.2,
-        25: 1.3,
-        35: 1.4,
-        45: 1.5,
-        55: 1.25,
-        60: 1,
+      {
+        ref: "size",
+        interpolation: "linear",
+        keyframes: {
+          0: 1,
+          5: 1.1,
+          15: 1.2,
+          25: 1.3,
+        },
       },
-    },
-  ],
-};
+    ],
+  },
+  /* inifite loop */
+  {
+    loopCount: -1,
+    frameCount: 60,
+    layers: [
+      {
+        ref: "color",
+        keyframes: {
+          0: "rgb(255,0,0)",
+          10: "rgb(205,0,0)",
+          20: "rgb(155,0,0)",
+          30: "rgb(105,0,0)",
+          40: "rgb(55,0,0)",
+          50: "rgb(180,0,0)",
+        },
+      },
+      {
+        ref: "size",
+        interpolation: "linear",
+        keyframes: {
+          0: 1,
+          5: 1.1,
+          15: 1.2,
+          25: 1.3,
+          35: 1.4,
+          45: 1.5,
+          55: 1.25,
+          60: 1,
+        },
+      },
+    ],
+  },
+];
 
 type State = {
   color: string;
@@ -57,15 +86,14 @@ const App = () => {
   );
   const [currentFrame, setCurrentFrame] = React.useState<number>();
   const [player] = React.useState(() => {
-    const p = createPlayer(updateFn, undefined, sampleAnimation);
-    console.log(p);
+    const p = createPlayer(updateFn);
     p.onFrameRendered(() => setCurrentFrame(p.currentFrame));
-    p.play();
+    p.play(...sampleAnimationStack);
     return p;
   });
   return (
     <div>
-      <h1>Demo 1</h1>
+      <h1>Demo 2</h1>
       <div>
         <button type="button" onClick={() => player.play()}>
           Play
@@ -76,7 +104,7 @@ const App = () => {
       </div>
 
       <div>
-        {_times(60, (i) => (
+        {_times(player.currentAnimation?.frameCount ?? 0, (i) => (
           <button
             type="button"
             key={i}
