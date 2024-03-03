@@ -882,6 +882,7 @@ __metadata:
     "@types/react": "npm:^18.2.61"
     esbuild: "npm:^0.20.1"
     keyframes-core: "workspace:packages/keyframes-core"
+    lodash: "npm:^4.17.21"
     react: "npm:^18.2.0"
     react-dom: "npm:^18.2.0"
   languageName: unknown
@@ -3368,22 +3369,6 @@ __metadata:
 "keyframes-monorepo@workspace:.":
   version: 0.0.0-use.local
   resolution: "keyframes-monorepo@workspace:."
-  languageName: unknown
-  linkType: soft
-
-"keyframes-ui@workspace:packages/keyframes-ui":
-  version: 0.0.0-use.local
-  resolution: "keyframes-ui@workspace:packages/keyframes-ui"
-  dependencies:
-    "@swc/cli": "npm:^0.3.10"
-    "@swc/core": "npm:^1.4.2"
-    "@types/jest": "npm:^29.5.12"
-    chokidar: "npm:^3.6.0"
-    jest: "npm:^29.7.0"
-    lodash: "npm:^4.17.21"
-    react: "npm:^18.2.0"
-    react-dom: "npm:^18.2.0"
-    typescript: "npm:^5.3.3"
   languageName: unknown
   linkType: soft
 

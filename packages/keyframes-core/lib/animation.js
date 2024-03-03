@@ -20,10 +20,36 @@ export function renderAnimationFrame(updateFn, animation, frame) {
         }
     }
 }
-export function renderLayer(updateFn, layer, frame) {
-    var _layer_keyframes;
-    var keyframe = (_layer_keyframes = layer.keyframes) === null || _layer_keyframes === void 0 ? void 0 : _layer_keyframes[frame];
-    if (keyframe) {
-        updateFn(layer.ref, keyframe);
+function _prepareLayer(layer) {
+    if ("keyrframeIndexes" in layer) return layer;
+    var preparedLayer = layer;
+    preparedLayer.keyframesIndexes = Object.keys(layer.keyframes).map(Number);
+    return preparedLayer;
+}
+function renderLayer(updateFn, layer, frame) {
+    var pLayer = _prepareLayer(layer);
+    //interpolate
+    var nextKeyframeIdx = pLayer.keyframesIndexes.findIndex(function(v) {
+        return v > frame;
+    });
+    if (nextKeyframeIdx > 0) {
+        var nextKeyFrameFrame = pLayer.keyframesIndexes[nextKeyframeIdx];
+        var nextKeyframe = pLayer.keyframes[nextKeyFrameFrame];
+        var prevKeyFrameFrame = pLayer.keyframesIndexes[nextKeyframeIdx - 1];
+        var prevKeyframe = pLayer.keyframes[prevKeyFrameFrame];
+        if (prevKeyframe) {
+            var prevKeyframeValue = typeof prevKeyframe === "object" && "value" in prevKeyframe ? prevKeyframe.value : prevKeyframe;
+            if (nextKeyframe && prevKeyFrameFrame != frame && (typeof nextKeyframe === "number" && pLayer.interpolation === "linear" || typeof nextKeyframe === "object" && "interpolation" in nextKeyframe && nextKeyframe.interpolation === "linear")) {
+                var nextKeyframeValue = typeof nextKeyframe === "object" && "value" in nextKeyframe ? nextKeyframe.value : nextKeyframe;
+                if (typeof prevKeyframeValue === "number" && typeof nextKeyframeValue === "number") {
+                    var diff = nextKeyFrameFrame - prevKeyFrameFrame;
+                    var diffFrame = frame - prevKeyFrameFrame;
+                    var interpolatedValue = prevKeyframeValue + (nextKeyframeValue - prevKeyframeValue) * diffFrame / diff;
+                    updateFn(pLayer.ref, interpolatedValue);
+                }
+            } else {
+                updateFn(pLayer.ref, prevKeyframeValue);
+            }
+        }
     }
 }

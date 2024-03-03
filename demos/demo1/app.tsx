@@ -2,6 +2,7 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import type { Animation, UpdateFn } from "keyframes-core/src";
 import { createPlayer } from "keyframes-core/src/simplePlayer";
+import _times from "lodash/times";
 
 const sampleAnimation: Animation<string, string | number> = {
   loopCount: -1,
@@ -54,20 +55,43 @@ const App = () => {
     },
     []
   );
+  const [currentFrame, setCurrentFrame] = React.useState<number>();
   const [player] = React.useState(() => {
     const p = createPlayer(updateFn, sampleAnimation);
+    console.log(p);
+    p.onFrameRendered(() => setCurrentFrame(p.currentFrame));
     p.play();
     return p;
   });
   return (
     <div>
       <h1>Demo 1</h1>
-      <button type="button" onClick={() => player.play()}>
-        Play
-      </button>
-      <button type="button" onClick={() => player.stop()}>
-        Stop
-      </button>
+      <div>
+        <button type="button" onClick={() => player.play()}>
+          Play
+        </button>
+        <button type="button" onClick={() => player.stop()}>
+          Stop
+        </button>
+      </div>
+
+      <div>
+        {_times(60, (i) => (
+          <button
+            type="button"
+            key={i}
+            onClick={() => {
+              player.stop();
+              player.renderFrame(i);
+            }}
+            style={{
+              color: i === currentFrame ? "white" : "unset",
+            }}
+          >
+            {i}
+          </button>
+        ))}
+      </div>
       <div
         style={{
           backgroundColor: state.color,

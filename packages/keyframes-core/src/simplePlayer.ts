@@ -8,8 +8,12 @@ type SimplePlayerOptions = {
 type FrameRenderedListener = { (): void };
 
 type Player = {
+  currentFrame: number;
+  currentLoop: number;
+  stopped: boolean;
   stop: { (): void };
   play: { (): void };
+  renderFrame: { (frame: number): void };
   onFrameRendered: { (handler: FrameRenderedListener): void };
 };
 
@@ -21,37 +25,43 @@ export function createPlayer<R, T>(
   const { loopCount = 0, frameCount } = animation;
   const frameDuration = options?.frameDuration ?? 1000 / 60;
 
-  let currentFrame = 0;
-  let currentLoop = 0;
-  let stopped = false;
-
   const listeners: FrameRenderedListener[] = [];
-  const onFrameRendered = (h) => {
-    listeners.push(h);
-  };
-  const stop = () => {
-    stopped = true;
-  };
-
-  const play = () => {
-    stopped = false;
-    const intervalId = setInterval(() => {
-      if (stopped) {
-        clearInterval(intervalId);
-        return;
-      }
-      renderAnimationFrame(updateFn, animation, currentFrame);
-      listeners.forEach((fn) => fn?.());
-      currentFrame++;
-      if (currentFrame >= frameCount) {
-        if (currentLoop < loopCount || loopCount < 0) {
-          currentLoop++;
-          currentFrame = 0;
-        } else {
+  return {
+    currentFrame: 0,
+    currentLoop: 0,
+    stopped: false,
+    stop: function () {
+      this.stopped = true;
+    },
+    play: function () {
+      this.stopped = false;
+      const intervalId = setInterval(() => {
+        if (this.stopped) {
           clearInterval(intervalId);
+          return;
         }
-      }
-    }, frameDuration);
+        if (this.currentFrame >= frameCount) {
+          if (this.currentLoop < loopCount || loopCount < 0) {
+            this.currentLoop++;
+            this.currentFrame = 0;
+          } else {
+            clearInterval(intervalId);
+          }
+        }
+
+        renderAnimationFrame(updateFn, animation, this.currentFrame);
+        listeners.forEach((fn) => fn?.());
+        this.currentFrame++;
+      }, frameDuration);
+    },
+    renderFrame: function (frame: number) {
+      this.currentFrame = frame;
+      renderAnimationFrame(updateFn, animation, this.currentFrame);
+      listeners.forEach((fn) => fn?.());
+      this.currentFrame++;
+    },
+    onFrameRendered: function (h) {
+      listeners.push(h);
+    },
   };
-  return { stop, play, onFrameRendered };
 }
