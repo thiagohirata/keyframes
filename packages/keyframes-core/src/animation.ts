@@ -32,42 +32,50 @@ function renderLayer<R, T>(
 ) {
   const pLayer = _prepareLayer(layer);
   const nextKeyframeIdx = pLayer.keyframesIndexes.findIndex((v) => v > frame);
+  const prevKeyframeIdx =
+    nextKeyframeIdx <= 0
+      ? pLayer.keyframesIndexes.length - 1
+      : nextKeyframeIdx - 1;
 
-  if (nextKeyframeIdx > 0) {
-    const nextKeyFrameFrame = pLayer.keyframesIndexes[nextKeyframeIdx];
-    const nextKeyframe = pLayer.keyframes[nextKeyFrameFrame];
-    const prevKeyFrameFrame = pLayer.keyframesIndexes[nextKeyframeIdx - 1];
+  const prevKeyFrameFrame = pLayer.keyframesIndexes[prevKeyframeIdx];
+  if (prevKeyFrameFrame != null) {
     const prevKeyframe = pLayer.keyframes[prevKeyFrameFrame];
-
     const prevKeyframeValue =
       typeof prevKeyframe === "object" &&
       prevKeyframe &&
       "value" in prevKeyframe
         ? prevKeyframe.value
         : prevKeyframe;
-    if (
-      nextKeyframe &&
-      prevKeyFrameFrame != frame &&
-      ((typeof nextKeyframe === "number" &&
-        pLayer.interpolation === "linear") ||
-        (typeof nextKeyframe === "object" &&
-          "interpolation" in nextKeyframe &&
-          nextKeyframe.interpolation === "linear"))
-    ) {
-      const nextKeyframeValue =
-        typeof nextKeyframe === "object" && "value" in nextKeyframe
-          ? nextKeyframe.value
-          : nextKeyframe;
+
+    if (nextKeyframeIdx > 0) {
+      const nextKeyFrameFrame = pLayer.keyframesIndexes[nextKeyframeIdx];
+      const nextKeyframe = pLayer.keyframes[nextKeyFrameFrame];
       if (
-        typeof prevKeyframeValue === "number" &&
-        typeof nextKeyframeValue === "number"
+        nextKeyframe != null &&
+        prevKeyFrameFrame != frame &&
+        ((typeof nextKeyframe === "number" &&
+          pLayer.interpolation === "linear") ||
+          (typeof nextKeyframe === "object" &&
+            "interpolation" in nextKeyframe &&
+            nextKeyframe.interpolation === "linear"))
       ) {
-        const diff = nextKeyFrameFrame - prevKeyFrameFrame;
-        const diffFrame = frame - prevKeyFrameFrame;
-        const interpolatedValue =
-          prevKeyframeValue +
-          ((nextKeyframeValue - prevKeyframeValue) * diffFrame) / diff;
-        updateFn(pLayer.ref, interpolatedValue as unknown as T);
+        const nextKeyframeValue =
+          typeof nextKeyframe === "object" && "value" in nextKeyframe
+            ? nextKeyframe.value
+            : nextKeyframe;
+        if (
+          typeof prevKeyframeValue === "number" &&
+          typeof nextKeyframeValue === "number"
+        ) {
+          const diff = nextKeyFrameFrame - prevKeyFrameFrame;
+          const diffFrame = frame - prevKeyFrameFrame;
+          const interpolatedValue =
+            prevKeyframeValue +
+            ((nextKeyframeValue - prevKeyframeValue) * diffFrame) / diff;
+          updateFn(pLayer.ref, interpolatedValue as unknown as T);
+        }
+      } else {
+        updateFn(pLayer.ref, prevKeyframeValue as unknown as T);
       }
     } else {
       updateFn(pLayer.ref, prevKeyframeValue as unknown as T);
