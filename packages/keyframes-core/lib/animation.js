@@ -28,7 +28,6 @@ function _prepareLayer(layer) {
 }
 function renderLayer(updateFn, layer, frame) {
     var pLayer = _prepareLayer(layer);
-    //interpolate
     var nextKeyframeIdx = pLayer.keyframesIndexes.findIndex(function(v) {
         return v > frame;
     });
@@ -37,19 +36,17 @@ function renderLayer(updateFn, layer, frame) {
         var nextKeyframe = pLayer.keyframes[nextKeyFrameFrame];
         var prevKeyFrameFrame = pLayer.keyframesIndexes[nextKeyframeIdx - 1];
         var prevKeyframe = pLayer.keyframes[prevKeyFrameFrame];
-        if (prevKeyframe) {
-            var prevKeyframeValue = typeof prevKeyframe === "object" && "value" in prevKeyframe ? prevKeyframe.value : prevKeyframe;
-            if (nextKeyframe && prevKeyFrameFrame != frame && (typeof nextKeyframe === "number" && pLayer.interpolation === "linear" || typeof nextKeyframe === "object" && "interpolation" in nextKeyframe && nextKeyframe.interpolation === "linear")) {
-                var nextKeyframeValue = typeof nextKeyframe === "object" && "value" in nextKeyframe ? nextKeyframe.value : nextKeyframe;
-                if (typeof prevKeyframeValue === "number" && typeof nextKeyframeValue === "number") {
-                    var diff = nextKeyFrameFrame - prevKeyFrameFrame;
-                    var diffFrame = frame - prevKeyFrameFrame;
-                    var interpolatedValue = prevKeyframeValue + (nextKeyframeValue - prevKeyframeValue) * diffFrame / diff;
-                    updateFn(pLayer.ref, interpolatedValue);
-                }
-            } else {
-                updateFn(pLayer.ref, prevKeyframeValue);
+        var prevKeyframeValue = typeof prevKeyframe === "object" && prevKeyframe && "value" in prevKeyframe ? prevKeyframe.value : prevKeyframe;
+        if (nextKeyframe && prevKeyFrameFrame != frame && (typeof nextKeyframe === "number" && pLayer.interpolation === "linear" || typeof nextKeyframe === "object" && "interpolation" in nextKeyframe && nextKeyframe.interpolation === "linear")) {
+            var nextKeyframeValue = typeof nextKeyframe === "object" && "value" in nextKeyframe ? nextKeyframe.value : nextKeyframe;
+            if (typeof prevKeyframeValue === "number" && typeof nextKeyframeValue === "number") {
+                var diff = nextKeyFrameFrame - prevKeyFrameFrame;
+                var diffFrame = frame - prevKeyFrameFrame;
+                var interpolatedValue = prevKeyframeValue + (nextKeyframeValue - prevKeyframeValue) * diffFrame / diff;
+                updateFn(pLayer.ref, interpolatedValue);
             }
+        } else {
+            updateFn(pLayer.ref, prevKeyframeValue);
         }
     }
 }
